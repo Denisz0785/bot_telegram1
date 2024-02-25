@@ -2,13 +2,17 @@ package main
 
 import (
 	"math/rand"
-
+	//import a packet to use function from it
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+// use pseudonym for *tgbotapi.BotAPI
 var bot *tgbotapi.BotAPI
 var chatId int64
 
+const TOKEN = "7127279387:AAFrii-J1Yx4YTL8pQavr30RYxIByakr-O4"
+
+// connectWithTelegram create a connection with telegram
 func connectWithTelegram() {
 	var err error
 	if bot, err = tgbotapi.NewBotAPI(TOKEN); err != nil {
@@ -16,16 +20,20 @@ func connectWithTelegram() {
 
 	}
 }
+
+// sendMessage send message to chat
 func sendMessage(msg string) {
 	msConfig := tgbotapi.NewMessage(chatId, msg)
 	bot.Send(msConfig)
 }
 
+// getAnswer generates answer randomly from a slice
 func getAnswer() string {
 	index := rand.Intn(len(answers))
 	return answers[index]
 }
 
+// sendAnswer send answer generated with getAnswer() to chat with to concrete message
 func sendAnswer(update *tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(chatId, getAnswer())
 	msg.ReplyToMessageID = update.Message.MessageID
@@ -70,8 +78,9 @@ var answers = []string{
 
 func main() {
 	connectWithTelegram()
-
+	//for getting all updates without limit
 	updateconfig := tgbotapi.NewUpdate(0)
+	// create and assign a new channel to update
 	for update := range bot.GetUpdatesChan(updateconfig) {
 		if update.Message != nil && update.Message.Text == "/start" {
 			chatId = update.Message.Chat.ID
